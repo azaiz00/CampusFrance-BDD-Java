@@ -1,0 +1,57 @@
+name: workflow.yml
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    # Tu peux ajouter "windows-latest" si tu veux un matrix multi-OS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Set up Google Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Show Chrome version
+        run: |
+          chrome --version || google-chrome --version || chromium --version
+
+      # Lance les tests en headless et force les plugins Cucumber pour rapport JSON/HTML
+      - name: Run tests (headless + cucumber reports)
+        run: |
+          mvn -B -Dheadless=true \
+            -Dcucumber.plugin="pretty, summary, json:target/cucumber.json, html:target/cucumber-report.html" \
+            test
+
+      # Uploader les rapports Cucumber (toujours, même si ça échoue)
+      - name: Upload Cucumber reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-reports
+          path: |
+            target/cucumber.json
+            target/cucumber-report.html
+          if-no-files-found: warn
+
+      # Uploader les rapports Surefire/JUnit (toujours)
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: |
+            target/surefire-reports/**
+          if-no-files-found: warn

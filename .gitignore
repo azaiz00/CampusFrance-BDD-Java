@@ -1,0 +1,62 @@
+# --- Java ---
+*.class
+*.log
+*.ctxt
+hs_err_pid*
+replay_pid*
+
+# --- Maven ---
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# --- Eclipse (si jamais ouvert avec) ---
+.project
+.classpath
+.settings/
+bin/
+
+# --- OS spécifiques ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Logs & rapports ---
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Rapports de tests générés
+surefire-reports/
+failsafe-reports/
+*.html
+*.json
+
+# --- Selenium/WebDriver ---
+# Si tu stockes des drivers manuels, ignore-les
+chromedriver.exe
+geckodriver.exe
+msedgedriver.exe
+
+# --- Autres ---
+node_modules/
