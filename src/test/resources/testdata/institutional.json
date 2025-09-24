@@ -1,0 +1,36 @@
+[
+  {
+    "Email": "institution1@example.com",
+    "Password": "InstPass123*",
+    "Gender": "Male",
+    "FirstName": "Pierre",
+    "LastName": "Martin",
+    "CountryOfResidence": "France",
+    "Nationality": "French",
+    "PostalCode": "13001",
+    "City": "Marseille",
+    "Phone": "+33633445566",
+    "Status": "Institutional",
+    "Function": "Cultural Attaché",
+    "OrganizationType": "Embassy",
+    "OrganizationName": "German Embassy in France",
+    "DGC": 1
+  },
+  {
+    "Email": "institution2@example.com",
+    "Password": "In$tSecure456",
+    "Gender": "Female",
+    "FirstName": "Claire",
+    "LastName": "Renard",
+    "CountryOfResidence": "France",
+    "Nationality": "French",
+    "PostalCode": "67000",
+    "City": "Strasbourg",
+    "Phone": "+33677889900",
+    "Status": "Institutional",
+    "Function": "Director",
+    "OrganizationType": "University",
+    "OrganizationName": "University of Strasbourg",
+    "DGC": 1
+  }
+]

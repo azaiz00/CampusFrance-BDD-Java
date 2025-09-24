@@ -47,10 +47,7 @@ $RECYCLE.BIN/
 *.swo
 
 # Rapports de tests générés
-surefire-reports/
-failsafe-reports/
-*.html
-*.json
+target/
 
 # --- Selenium/WebDriver ---
 # Si tu stockes des drivers manuels, ignore-les

@@ -1,0 +1,35 @@
+[
+  {
+    "Email": "researcher1@example.com",
+    "Password": "ResearchPass123*",
+    "Gender": "Male",
+    "FirstName": "Thomas",
+    "LastName": "Moreau",
+    "CountryOfResidence": "France",
+    "Nationality": "French",
+    "PostalCode": "31000",
+    "City": "Toulouse",
+    "Phone": "+33611223344",
+    "Status": "Researcher",
+    "ResearchField": "Informatique",
+    "ResearchLevel": "Doctorat / PhD",
+    "DGC": 1
+  },
+  {
+    "Email": "researcher2@example.com",
+    "Password": "Rese@rch789",
+    "Gender": "Female",
+    "FirstName": "Sophie",
+    "LastName": "Giraud",
+    "CountryOfResidence": "France",
+    "Nationality": "French",
+    "PostalCode": "44000",
+    "City": "Nantes",
+    "Phone": "+33655667788",
+    "Status": "Researcher",
+    "ResearchField": "Droit",
+    "ResearchLevel": "Doctorat / PhD",
+    "DGC": 1
+  }
+]
+

@@ -1,0 +1,35 @@
+[
+  {
+    "Email": "student1@example.com",
+    "Password": "StudentPass123*",
+    "Gender": "Male",
+    "FirstName": "Lucas",
+    "LastName": "Dupont",
+    "CountryOfResidence": "Kenya",
+    "Nationality": "French",
+    "PostalCode": "75001",
+    "City": "Paris",
+    "Phone": "+33612345678",
+    "Status": "Student",
+    "StudyField": "Chimie",
+    "StudyLevel": "Licence 1",
+    "DGC": 1
+  },
+  {
+    "Email": "student2@example.com",
+    "Password": "SecurePass456*",
+    "Gender": "Female",
+    "FirstName": "Emma",
+    "LastName": "Leroux",
+    "CountryOfResidence": "France",
+    "Nationality": "French",
+    "PostalCode": "69003",
+    "City": "Lyon",
+    "Phone": "+33698765432",
+    "Status": "Student",
+    "StudyField": "Biologie",
+    "StudyLevel": "Licence 3",
+    "DGC": 0
+  }
+]
+
