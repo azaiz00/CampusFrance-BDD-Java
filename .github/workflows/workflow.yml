@@ -55,3 +55,29 @@ jobs:
           path: |
             target/surefire-reports/**
           if-no-files-found: warn
+
+  deploy-report:
+    needs: test
+    if: success() || failure()   # publier même si des tests échouent
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download cucumber report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cucumber-reports
+          path: report
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload report to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
