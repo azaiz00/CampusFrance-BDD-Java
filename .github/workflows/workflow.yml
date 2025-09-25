@@ -1,28 +1,20 @@
-name: CI & Pages
+name: workflow.yml
 
 on:
   push:
-    branches: ["main"]
+    branches: ["**"]
   pull_request:
 
-permissions:
-  contents: read
-  pages: write       # nécéssaire pour deploy-pages
-  id-token: write    # nécéssaire pour deploy-pages (OIDC)
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
-  test-and-deploy:
+  test:
+    # Tu peux ajouter "windows-latest" si tu veux un matrix multi-OS
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up Java 17 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -33,73 +25,59 @@ jobs:
         uses: browser-actions/setup-chrome@v1
 
       - name: Show Chrome version
-        run: chrome --version || google-chrome --version || chromium --version
+        run: |
+          chrome --version || google-chrome --version || chromium --version
 
+      # Lance les tests en headless et force les plugins Cucumber pour rapport JSON/HTML
       - name: Run tests (headless + cucumber reports)
-        env:
-          CI: "true"
         run: |
           mvn -B -Dheadless=true \
             -Dcucumber.plugin="pretty, summary, json:target/cucumber.json, html:target/cucumber-report.html" \
             test
 
-      # Prépare le dossier à publier sur Pages
-      - name: Prepare site
-        run: |
-          mkdir -p site
-          cp -f target/cucumber-report.html site/
-          cp -f target/cucumber.json site/
-          # Optionnel : copier aussi les rapports Surefire
-          mkdir -p site/surefire-reports
-          if [ -d target/surefire-reports ]; then
-            cp -r target/surefire-reports/* site/surefire-reports/ || true
-          fi
-          # Créer une page d'accueil simple
-          cat > site/index.html <<'HTML'
-          <!doctype html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8" />
-            <title>CampusFrance BDD - Reports</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <style>
-              body { font-family: system-ui, Arial, sans-serif; margin: 40px; line-height: 1.6; }
-              h1 { color: #1f2937; }
-              a { color: #2563eb; text-decoration: none; }
-              a:hover { text-decoration: underline; }
-              .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 12px 0; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-            </style>
-          </head>
-          <body>
-            <h1>📊 CampusFrance BDD - Test Reports</h1>
-            <div class="card">
-              <h3>Cucumber</h3>
-              <ul>
-                <li><a href="cucumber-report.html">Cucumber Report (HTML)</a></li>
-                <li><a href="cucumber.json">Cucumber JSON</a></li>
-              </ul>
-            </div>
-            <div class="card">
-              <h3>Surefire (JUnit)</h3>
-              <ul>
-                <li><a href="surefire-reports/">Open surefire-reports/</a></li>
-              </ul>
-            </div>
-            <p><em>Published automatically by GitHub Actions.</em></p>
-          </body>
-          </html>
-          HTML
+      # Uploader les rapports Cucumber (toujours, même si ça échoue)
+      - name: Upload Cucumber reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-reports
+          path: |
+            target/cucumber.json
+            target/cucumber-report.html
+          if-no-files-found: warn
 
-      # Configure Pages et upload de l’artefact "site"
+      # Uploader les rapports Surefire/JUnit (toujours)
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: |
+            target/surefire-reports/**
+          if-no-files-found: warn
+
+  deploy-report:
+    needs: test
+    if: success() || failure()   # publier même si des tests échouent
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download cucumber report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cucumber-reports
+          path: report
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Pages artifact
+      - name: Upload report to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: report
 
-      # Déploiement sur GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

@@ -47,7 +47,7 @@ $RECYCLE.BIN/
 *.swo
 
 # Rapports de tests générés
-target/
+
 
 # --- Selenium/WebDriver ---
 # Si tu stockes des drivers manuels, ignore-les
