@@ -1,18 +1,9 @@
-name: CI & Pages
+name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["**"]
   pull_request:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
 
 jobs:
   test:
@@ -22,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up Java 17 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -35,100 +26,32 @@ jobs:
       - name: Show Chrome version
         run: chrome --version || google-chrome --version || chromium --version
 
-      - name: Run tests (headless + cucumber reports)
+      - name: Run tests (headless)
         env:
-          CI: "true"
+          CI: "true"           # permet d'activer tes flags Chrome spéciaux en CI
         run: |
           mvn -B -Dheadless=true \
             -Dcucumber.plugin="pretty, summary, json:target/cucumber.json, html:target/cucumber-report.html" \
             test
 
-      - name: List target content (debug)
-        run: |
-          echo "==== target/ ===="
-          ls -la target || true
+      - name: List target (debug)
+        if: always()
+        run: ls -la target || true
 
-      # Prépare le site à publier
-      - name: Build site folder
-        run: |
-          mkdir -p site
-          # Rapports Cucumber (HTML requis, JSON optionnel)
-          if [ -f target/cucumber-report.html ]; then cp target/cucumber-report.html site/; fi
-          if [ -f target/cucumber.json ]; then cp target/cucumber.json site/; fi
-
-          # Rapports Surefire (optionnel)
-          if [ -d target/surefire-reports ]; then
-            mkdir -p site/surefire-reports
-            cp -r target/surefire-reports/* site/surefire-reports/ || true
-          fi
-
-          # Page d’accueil
-          cat > site/index.html <<'HTML'
-          <!doctype html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8" />
-            <title>CampusFrance BDD - Test Reports</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <style>
-              body { font-family: system-ui, Arial, sans-serif; margin: 40px; line-height: 1.6; }
-              h1 { color: #1f2937; }
-              a { color: #2563eb; text-decoration: none; }
-              a:hover { text-decoration: underline; }
-              .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 12px 0; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-              code { background:#f3f4f6; padding:2px 6px; border-radius:6px;}
-            </style>
-          </head>
-          <body>
-            <h1>📊 CampusFrance BDD - Test Reports</h1>
-
-            <div class="card">
-              <h3>Cucumber</h3>
-              <ul>
-                <li><a href="cucumber-report.html">Cucumber Report (HTML)</a></li>
-                <li><a href="cucumber.json">Cucumber JSON</a> (if present)</li>
-              </ul>
-            </div>
-
-            <div class="card">
-              <h3>Surefire (JUnit)</h3>
-              <ul>
-                <li><a href="surefire-reports/">Open <code>surefire-reports/</code></a></li>
-              </ul>
-            </div>
-
-            <p><em>Published automatically by GitHub Actions.</em></p>
-          </body>
-          </html>
-          HTML
-
-      # On uploade un SEUL artefact "site"
-      - name: Upload site artifact
+      - name: Upload Cucumber reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: site
-          path: site
-          if-no-files-found: error
+          name: cucumber-reports
+          path: |
+            target/cucumber-report.html
+            target/cucumber.json
+          if-no-files-found: warn
 
-  deploy-report:
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download site artifact
-        uses: actions/download-artifact@v4
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: site
-          path: site
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          name: surefire-reports
+          path: target/surefire-reports/**
+          if-no-files-found: warn
